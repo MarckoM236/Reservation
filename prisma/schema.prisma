@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Users {
+  id          Int    @id @default(autoincrement())
+  name        String
+  email       String @unique
+  password    String
+  status      Boolean
+  created_at  DateTime
+  updated_at  DateTime
+
+  reservations Reservations[]
+}
+
+model Resources {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String ?
+  location    String ?
+  status      Boolean
+  created_at  DateTime
+  updated_at  DateTime
+
+  reservations Reservations[]
+}
+
+//options status of reservation
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+model Reservations {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  resource_id Int
+  start_date  DateTime 
+  end_date    DateTime
+  status      ReservationStatus @default(PENDING)
+  notes       String ?
+
+  user        Users     @relation(fields: [user_id], references: [id])
+  resource    Resources @relation(fields: [resource_id], references: [id])
+
+  @@index([user_id])
+  @@index([resource_id])
+  @@index([start_date])
+}
+
+
