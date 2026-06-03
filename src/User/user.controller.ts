@@ -1,24 +1,26 @@
 import { Controller, Get, Param, ParseIntPipe, Post, Body, Put, Delete} from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/user-create.dto';
-import { UpdateUserDto } from './dto/user-update-dto';
+import { CreateUserDto } from './dtos/user-create.dto';
+import { UpdateUserDto } from './dtos/user-update-dto';
+import { ResponseInterface } from 'src/common/interfaces/response.interface';
+import { UserResponse } from './types/user.type';
 
 @Controller('users')
 export class UserController {
   constructor(private UserService: UserService) {}
 
   @Get()
-  getUsers(): any {
-    return this.UserService.getUsers();
+  async asyncgetUsers(): Promise<UserResponse[]> {
+    return await this.UserService.getUsers();
   }
 
   @Get(':id')
-  getUserById(@Param('id', ParseIntPipe) id: number): any {
-    return this.UserService.getUserById(id);
+  async getUserById(@Param('id', ParseIntPipe) id: number): Promise<UserResponse | null> {
+    return await this.UserService.getUserById(id);
   }
 
   @Post()
-  async createUser(@Body() user: CreateUserDto): Promise<any> {
+  async createUser(@Body() user: CreateUserDto): Promise<ResponseInterface<UserResponse>> {
     
     let create = await this.UserService.createUser(user);
 
@@ -30,7 +32,7 @@ export class UserController {
   }
 
   @Put(':id')
-  async updateUser(@Body() user: UpdateUserDto, @Param('id', ParseIntPipe) id: number): Promise<any> {
+  async updateUser(@Body() user: UpdateUserDto, @Param('id', ParseIntPipe) id: number): Promise<ResponseInterface<UserResponse>> {
 
     let update = await this.UserService.updateUser(user, id);
 
@@ -42,7 +44,7 @@ export class UserController {
   }
 
   @Delete(':id')
-  async deleteUser(@Param('id', ParseIntPipe) id: number): Promise<any> {
+  async deleteUser(@Param('id', ParseIntPipe) id: number): Promise<ResponseInterface<UserResponse>> {
     let deleted = await this.UserService.deleteUser(id);
 
     return {
